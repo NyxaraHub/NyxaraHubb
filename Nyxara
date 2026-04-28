@@ -1,0 +1,86 @@
+local LP = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local TS = game:GetService("TweenService")
+local PG = LP:WaitForChild("PlayerGui")
+
+if PG:FindFirstChild("NyxaraHub") then PG.NyxaraHub:Destroy() end
+
+local SG = Instance.new("ScreenGui", PG); SG.Name = "NyxaraHub"; SG.DisplayOrder = 9e9
+
+local Main = Instance.new("Frame", SG)
+Main.Size = UDim2.new(0, 480, 0, 360); Main.Position = UDim2.new(0.5, -240, 0.3, 0)
+Main.BackgroundColor3 = Color3.fromRGB(10, 10, 10); Main.Active = true; Main.Draggable = true; Main.ClipsDescendants = true
+Instance.new("UIStroke", Main).Color = Color3.fromRGB(255, 0, 0)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+local Logo = Instance.new("ImageLabel", Main)
+Logo.Size = UDim2.new(0, 50, 0, 50); Logo.Position = UDim2.new(0, 10, 0, 10); Logo.Image = "rbxassetid://77006895044278"; Logo.BackgroundTransparency = 1
+
+local Brand = Instance.new("TextLabel", Main)
+Brand.Size = UDim2.new(0, 70, 0, 20); Brand.Position = UDim2.new(0, 0, 0, 60); Brand.Text = "NyxaraHub"; Brand.TextColor3 = Color3.new(1,0,0); Brand.Font = Enum.Font.GothamBold; Brand.TextSize = 12; Brand.BackgroundTransparency = 1
+
+local OpenBtn = Instance.new("ImageButton", SG)
+OpenBtn.Size = UDim2.new(0, 60, 0, 60); OpenBtn.Position = UDim2.new(0, 20, 0.5, -30); OpenBtn.Image = "rbxassetid://77006895044278"; OpenBtn.Visible = false; OpenBtn.BackgroundTransparency = 1; OpenBtn.Active = true; OpenBtn.Draggable = true
+
+local function ToggleMenu(state)
+    if state then
+        Main.Visible = true
+        Main:TweenSize(UDim2.new(0, 480, 0, 360), "Out", "Back", 0.5, true)
+        OpenBtn.Visible = false
+    else
+        Main:TweenSize(UDim2.new(0, 0, 0, 0), "In", "Quad", 0.4, true, function() Main.Visible = false; OpenBtn.Visible = true end)
+    end
+end
+
+OpenBtn.MouseButton1Click:Connect(function() ToggleMenu(true) end)
+
+local CloseBtn = Instance.new("TextButton", Main)
+CloseBtn.Size = UDim2.new(0, 30, 0, 30); CloseBtn.Position = UDim2.new(1, -35, 0, 5); CloseBtn.Text = "X"; CloseBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0); CloseBtn.TextColor3 = Color3.new(1, 1, 1); CloseBtn.MouseButton1Click:Connect(function() ToggleMenu(false) end); Instance.new("UICorner", CloseBtn)
+
+local WatchF = Instance.new("Frame", Main); WatchF.Size = UDim2.new(1, -20, 1, -90); WatchF.Position = UDim2.new(0, 10, 0, 80); WatchF.BackgroundTransparency = 1
+local SpyF = Instance.new("Frame", Main); SpyF.Size = UDim2.new(1, -20, 1, -90); SpyF.Position = UDim2.new(0, 10, 0, 80); SpyF.BackgroundTransparency = 1; SpyF.Visible = false
+
+local function CreateTab(txt, x, f1, f2)
+    local b = Instance.new("TextButton", Main); b.Size = UDim2.new(0, 100, 0, 30); b.Position = UDim2.new(0, x, 0, 20); b.Text = txt; b.BackgroundColor3 = Color3.fromRGB(30, 30, 30); b.TextColor3 = Color3.new(1,1,1); b.Font = Enum.Font.GothamBold; Instance.new("UICorner", b)
+    b.MouseButton1Click:Connect(function() f1.Visible = true; f2.Visible = false end)
+end
+CreateTab("WATCH", 100, WatchF, SpyF); CreateTab("SPY CHAT", 210, SpyF, WatchF)
+
+local Search = Instance.new("TextBox", WatchF); Search.Size = UDim2.new(0.4, 0, 0, 30); Search.PlaceholderText = "Ara..."; Search.BackgroundColor3 = Color3.new(0,0,0); Search.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", Search)
+local List = Instance.new("ScrollingFrame", WatchF); List.Size = UDim2.new(0.4, 0, 1, -40); List.Position = UDim2.new(0, 0, 0, 40); List.BackgroundColor3 = Color3.fromRGB(15,15,15); List.CanvasSize = UDim2.new(0,0,0,0); Instance.new("UIListLayout", List)
+
+local DataBox = Instance.new("TextLabel", WatchF); DataBox.Size = UDim2.new(0.55, 0, 0.7, 0); DataBox.Position = UDim2.new(0.45, 0, 0, 0); DataBox.BackgroundColor3 = Color3.new(0,0,0); DataBox.TextColor3 = Color3.new(1,1,1); DataBox.Text = "Veri bekleniyor..."; DataBox.TextWrapped = true; DataBox.TextSize = 13; Instance.new("UICorner", DataBox)
+
+local Back = Instance.new("TextButton", WatchF); Back.Size = UDim2.new(0.55, 0, 0, 35); Back.Position = UDim2.new(0.45, 0, 0.8, 0); Back.Text = "GERI DON"; Back.BackgroundColor3 = Color3.fromRGB(0, 80, 0); Back.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", Back)
+Back.MouseButton1Click:Connect(function() workspace.CurrentCamera.CameraSubject = LP.Character.Humanoid end)
+
+local function UpdateList()
+    for _, v in pairs(List:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LP and p.Name:lower():find(Search.Text:lower()) then
+            local b = Instance.new("TextButton", List); b.Size = UDim2.new(1, 0, 0, 30); b.Text = p.DisplayName; b.BackgroundColor3 = Color3.fromRGB(40,0,0); b.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", b)
+            b.MouseButton1Click:Connect(function()
+                workspace.CurrentCamera.CameraSubject = p.Character.Humanoid
+                task.spawn(function()
+                    while workspace.CurrentCamera.CameraSubject == p.Character.Humanoid do
+                        local dist = math.floor((LP.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude)
+                        local inv = {}
+                        for _, t in pairs(p.Backpack:GetChildren()) do table.insert(inv, t.Name) end
+                        if p.Character:FindFirstChildOfClass("Tool") then table.insert(inv, p.Character:FindFirstChildOfClass("Tool").Name) end
+                        DataBox.Text = "ISIM: "..p.Name.."\nCAN: "..math.floor(p.Character.Humanoid.Health).."\nTEAM: "..p.Team.Name.."\nMESAFE: "..dist.."m\nENVANTER: "..table.concat(inv, ", ")
+                        task.wait(0.5)
+                    end
+                end)
+            end)
+        end
+    end
+end
+Search:GetPropertyChangedSignal("Text"):Connect(UpdateList); Players.PlayerAdded:Connect(UpdateList); Players.PlayerRemoving:Connect(UpdateList); UpdateList()
+
+local Log = Instance.new("ScrollingFrame", SpyF); Log.Size = UDim2.new(1, 0, 1, 0); Log.BackgroundColor3 = Color3.new(0,0,0); Log.CanvasSize = UDim2.new(0,0,50,0); Instance.new("UIListLayout", Log)
+local function Hook(p)
+    p.Chatted:Connect(function(msg)
+        local l = Instance.new("TextLabel", Log); l.Size = UDim2.new(1,0,0,20); l.Text = "["..p.DisplayName.."]: "..msg; l.TextColor3 = (p.Team and p.Team.TeamColor.Color or Color3.new(1,1,1)); l.BackgroundTransparency = 1; l.TextXAlignment = Enum.TextXAlignment.Left; l.TextSize = 12
+    end)
+end
+for _, p in pairs(Players:GetPlayers()) do Hook(p) end; Players.PlayerAdded:Connect(Hook)
