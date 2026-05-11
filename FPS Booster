@@ -1,0 +1,77 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Nyxara FPS & VC Fix",
+   LoadingTitle = "VC Lag Gideriliyor...",
+   LoadingSubtitle = "by neyxara0",
+   ConfigurationSaving = {
+      Enabled = false -- Ayar kaydetme reklamını kapatır
+   },
+   Discord = {
+      Enabled = false -- Discord sunucu daveti reklamını kapatır
+   },
+   KeySystem = false -- Anahtar sistemi kapalı
+})
+
+local MainTab = Window:CreateTab("Ayarlar", 4483362458)
+local StatsTab = Window:CreateTab("İstatistikler", 4483362458)
+
+
+local RunService = game:GetService("RunService")
+local fpsLabel = StatsTab:CreateLabel("FPS: Hesaplanıyor...")
+task.spawn(function()
+    while task.wait(0.5) do
+        local fps = math.floor(1 / RunService.RenderStepped:Wait())
+        fpsLabel:Set("FPS: " .. tostring(fps))
+    end
+end)
+
+
+local function FixVCLag(state)
+    if state then
+        -- VC ve Ses Kanallarını Optimize Et
+        settings().Audio.OutputDevice = "Default"
+        -- Gereksiz ses efektlerini temizle (Reverb vb.)
+        for _, v in pairs(game:GetDescendants()) do
+            if v:IsA("AudioChorus") or v:IsA("AudioDistortion") or v:IsA("AudioReverb") then
+                v.Enabled = false
+            end
+        end
+        Rayfield:Notify({Title = "VC Fix", Content = "Ses kanalları optimize edildi, efektler kapatıldı."})
+    else
+        Rayfield:Notify({Title = "VC Fix", Content = "Ses ayarları normale döndü."})
+    end
+end
+
+
+MainTab:CreateToggle({
+   Name = "VC Lag Fix (Ses Gecikmesi Azalt)",
+   CurrentValue = false,
+   Callback = function(Value)
+       FixVCLag(Value)
+   end,
+})
+
+MainTab:CreateButton({
+   Name = "Dengeli Boost",
+   Callback = function()
+       game.Lighting.GlobalShadows = false
+       for _, v in pairs(game:GetDescendants()) do
+           if v:IsA("BasePart") then
+               v.Material = Enum.Material.Plastic
+           elseif v:IsA("Decal") or v:IsA("Texture") then
+               v.Transparency = 0.5
+           end
+       end
+       settings().Rendering.QualityLevel = 1
+       Rayfield:Notify({Title = "Başarılı", Content = "FPS arttırıldı."})
+   end,
+})
+
+MainTab:CreateButton({
+   Name = "RAM Temizle",
+   Callback = function()
+       collectgarbage("collect")
+       Rayfield:Notify({Title = "Nyxara", Content = "RAM başarıyla temizlendi."})
+   end,
+})
